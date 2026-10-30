@@ -17,7 +17,10 @@
     "test": "vitest run",
     "typecheck": "tsc -p ."
   },
-  "dependencies": {},
+  "dependencies": {
+    "commander": "^15.0.0",
+    "picocolors": "^1.1.1"
+  },
   "devDependencies": {
     "@revio/core": "workspace:*",
     "@revio/types": "workspace:*"
