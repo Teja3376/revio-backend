@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revio Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* layout: a five-stop phase rail up top, then one section per phase, read top to bottom like a diff */
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #161a22;
+  --muted: #5b6475;
+  --line: #dfe3ea;
+  --accent: #2d55c8;
+  --accent-soft: #e6ecfb;
+  --add: #1f7a46;
+  --add-soft: #e3f3e9;
+  --warn: #9a5b00;
+  --warn-soft: #fbefdc;
+  --font-display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1218; --surface: #161b24; --ink: #e7eaf0; --muted: #9aa3b4; --line: #283041;
+    --accent: #8aa6ff; --accent-soft: #1c2640; --add: #6fd39a; --add-soft: #15291f;
+    --warn: #f0b765; --warn-soft: #2d2213; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1218; --surface: #161b24; --ink: #e7eaf0; --muted: #9aa3b4; --line: #283041;
+  --accent: #8aa6ff; --accent-soft: #1c2640; --add: #6fd39a; --add-soft: #15291f;
+  --warn: #f0b765; --warn-soft: #2d2213; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-body); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 40px 20px 72px; display: grid; gap: 32px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
+h3 { font-size: 1rem; font-family: var(--font-body); font-weight: 600; }
+p { margin: 0; max-width: 65ch; }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.tag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+header { display: grid; gap: 12px; }
+header .lead { color: var(--muted); font-size: 1.08rem; }
+
+/* phase rail */
+.rail { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; list-style: none; padding: 0; margin: 0; }
+.rail a { display: grid; gap: 4px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); text-decoration: none; color: var(--ink); border-top: 3px solid var(--accent); height: 100%; }
+.rail a:hover { background: var(--accent-soft); }
+.rail b { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); font-weight: 500; }
+.rail span { font-weight: 600; font-size: 0.95rem; line-height: 1.3; }
+.rail small { color: var(--muted); font-size: 0.8rem; }
+@media (max-width: 720px) { .rail { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 420px) { .rail { grid-template-columns: 1fr; } }
+
+/* depth table */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+.depth { font-family: var(--font-mono); font-size: 0.82rem; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+
+/* phase sections */
+.phase { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; display: grid; gap: 18px; scroll-margin-top: 16px; }
+.phase-head { display: grid; gap: 6px; }
+.phase-head .tag { color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--font-mono); font-size: 0.8rem; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
+.done { display: flex; gap: 10px; align-items: baseline; padding: 10px 14px; border-radius: 8px; background: var(--add-soft); color: var(--ink); }
+.done b { color: var(--add); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
+ol.tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+ol.tasks li { display: grid; grid-template-columns: 4.2rem 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+ol.tasks li:last-child { border-bottom: 0; }
+ol.tasks .num { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); padding-top: 2px; }
+ol.tasks h3 { margin-bottom: 2px; }
+ol.tasks p { color: var(--muted); font-size: 0.93rem; }
+.needs { font-size: 0.9rem; color: var(--muted); }
+.needs strong { color: var(--ink); font-weight: 600; }
+.status { font-family: var(--font-mono); font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; justify-self: start; }
+.status.detailed { background: var(--add-soft); color: var(--add); }
+.status.later { background: var(--warn-soft); color: var(--warn); }
+
+/* risks */
+.risks { display: grid; gap: 10px; list-style: none; padding: 0; margin: 0; }
+.risks li { padding: 12px 14px; border-left: 3px solid var(--warn); background: var(--surface); border-radius: 0 8px 8px 0; border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.risks b { display: block; }
+.risks span { color: var(--muted); font-size: 0.93rem; }
+footer { color: var(--muted); font-size: 0.88rem; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<header>
+  <span class="tag">revio · build plan · 30 Oct 2026</span>
+  <h1>Revio Build Plan</h1>
+  <p class="lead">One shared review engine powering three tools: a CLI that reviews quietly while you code, a VS Code extension that reviews each commit, and a GitHub App that reviews pull requests. Built in five phases, and each phase ships something you can use.</p>
+</header>
+
+<nav aria-label="Phases">
+  <ol class="rail">
+    <li><a href="#phase-0"><b>Phase 0</b><span>Foundation</span><small>shared engine</small></a></li>
+    <li><a href="#phase-1"><b>Phase 1</b><span>CLI</span><small>npm package</small></a></li>
+    <li><a href="#phase-2"><b>Phase 2</b><span>VS Code</span><small>extension</small></a></li>
+    <li><a href="#phase-3"><b>Phase 3</b><span>GitHub App</span><small>+ API + website</small></a></li>
+    <li><a href="#phase-4"><b>Phase 4</b><span>Deploy</span><small>Cloudflare, live</small></a></li>
+  </ol>
+</nav>
+
+<section aria-labelledby="depth-h" style="display:grid; gap:12px;">
+  <h2 id="depth-h">Same engine, three depths</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Tool</th><th>When it runs</th><th>Depth</th><th>What it checks</th></tr></thead>
+      <tbody>
+        <tr><td>CLI</td><td>on save, on demand, before commit</td><td><span class="depth">quick</span></td><td>bugs, security</td></tr>
+        <tr><td>VS Code</td><td>after each commit</td><td><span class="depth">normal</span></td><td>+ performance, code quality</td></tr>
+        <tr><td>GitHub App</td><td>PR opened or updated</td><td><span class="depth">full</span></td><td>+ style, PR summary, risk level</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="phase" id="phase-0" aria-labelledby="p0">
+  <div class="phase-head">
+    <span class="tag">Phase 0</span>
+    <h2 id="p0">Foundation: the shared review engine</h2>
+    <p>The monorepo and <code>packages/core</code>, which turns a git diff into a validated list of issues using Gemini.</p>
+  </div>
+  <div class="chips"><span class="chip">TypeScript</span><span class="chip">Node 20+</span><span class="chip">pnpm</span><span class="chip">Turborepo</span><span class="chip">@google/genai</span><span class="chip">zod</span><span class="chip">picomatch</span><span class="chip">vitest</span><span class="chip">Biome</span><span class="chip">GitHub Actions</span></div>
+  <ol class="tasks">
+    <li><span class="num">Task 1</span><div><h3>Monorepo scaffold + shared types</h3><p>Workspace, CI, and the Issue / Depth / Config types with zod schemas.</p></div></li>
+    <li><span class="num">Task 2</span><div><h3>Diff parser</h3><p>Reads git diffs: changed line numbers per file; handles deleted, renamed and binary files.</p></div></li>
+    <li><span class="num">Task 3</span><div><h3>File filtering + depth categories</h3><p>Skips lockfiles, build output and your ignore list, and decides what each depth checks.</p></div></li>
+    <li><span class="num">Task 4</span><div><h3>Review engine</h3><p>Prompt, Gemini call, JSON validation, one retry on bad output, splitting large diffs, dropping issues on unchanged lines.</p></div></li>
+    <li><span class="num">Task 5</span><div><h3>Config loading</h3><p>Reads <code>.revio.json</code> and gives clear errors when it's wrong.</p></div></li>
+  </ol>
+  <div class="done"><b>DONE WHEN</b><span>a diff goes in and a clean list of issues comes out, fully tested.</span></div>
+  <p class="needs"><strong>You'll need:</strong> Gemini API key.</p>
+  <span class="status detailed">fully detailed in the plan</span>
+</section>
+
+<section class="phase" id="phase-1" aria-labelledby="p1">
+  <div class="phase-head">
+    <span class="tag">Phase 1</span>
+    <h2 id="p1">CLI: the npm package</h2>
+    <p>Quiet reviews in the terminal. It prints only when it finds something.</p>
+  </div>
+  <div class="chips"><span class="chip">commander</span><span class="chip">chokidar</span><span class="chip">git (execFile)</span><span class="chip">picocolors</span><span class="chip">tsup</span><span class="chip">changesets</span></div>
+  <ol class="tasks">
+    <li><span class="num">Task 6</span><div><h3>Git helpers</h3><p>Working-tree, staged and branch diffs, including new untracked files and repos with no commits yet.</p></div></li>
+    <li><span class="num">Task 7</span><div><h3><code>revio review</code></h3><p>On-demand review with readable output and exit codes: 0 ok, 1 blocking issues, 2 errors.</p></div></li>
+    <li><span class="num">Task 8</span><div><h3><code>revio watch</code></h3><p>Reviews on save after a 2-second pause, skips unchanged diffs, and keeps running if Gemini fails.</p></div></li>
+    <li><span class="num">Task 9</span><div><h3><code>revio hook install</code></h3><p>Pre-commit check. It doesn't block commits by default, and it keeps any hook you already have.</p></div></li>
+    <li><span class="num">Task 10</span><div><h3>Publish to npm</h3><p>Check the package name, build, test the packed tarball, release workflow. You do the first publish yourself.</p></div></li>
+  </ol>
+  <div class="done"><b>DONE WHEN</b><span><code>npm i -g</code> it, run <code>revio watch</code>, and issues appear as you save.</span></div>
+  <p class="needs"><strong>You'll need:</strong> npm account.</p>
+  <span class="status detailed">fully detailed in the plan</span>
+</section>
+
+<section class="phase" id="phase-2" aria-labelledby="p2">
+  <div class="phase-head">
+    <span class="tag">Phase 2</span>
+    <h2 id="p2">VS Code extension</h2>
+    <p>Every commit gets reviewed in the background. Issues show as underlines, with a one-click fix.</p>
+  </div>
+  <div class="chips"><span class="chip">VS Code API</span><span class="chip">vscode.git API</span><span class="chip">Diagnostics</span><span class="chip">Code Actions</span><span class="chip">SecretStorage</span><span class="chip">esbuild</span><span class="chip">vsce</span></div>
+  <ol class="tasks">
+    <li><span class="num">Task 11</span><div><h3>Scaffold + API key</h3><p>"Set Gemini API Key" command stores the key securely; settings for on/off and depth.</p></div></li>
+    <li><span class="num">Task 12</span><div><h3>Commit detection</h3><p>Notices new commits and reviews that commit only, with a status bar spinner and no popups.</p></div></li>
+    <li><span class="num">Task 13</span><div><h3>Underlines + quick fix</h3><p>Issues in the Problems panel, "Apply Revio fix" on hover, cleared when you edit the file.</p></div></li>
+    <li><span class="num">Task 14</span><div><h3>Publish to Marketplace</h3><p>Package, icon, README, release workflow.</p></div></li>
+  </ol>
+  <div class="done"><b>DONE WHEN</b><span>it's installable from the Marketplace and every commit gets underlined issues.</span></div>
+  <p class="needs"><strong>You'll need:</strong> VS Code Marketplace publisher + Azure DevOps token.</p>
+  <span class="status later">detailed plan written before this phase starts</span>
+</section>
+
+<section class="phase" id="phase-3" aria-labelledby="p3">
+  <div class="phase-head">
+    <span class="tag">Phase 3</span>
+    <h2 id="p3">GitHub App, backend and website</h2>
+    <p>Automatic PR reviews with inline comments and a summary. The website shows your repos, settings and review history.</p>
+  </div>
+  <div class="chips"><span class="chip">NestJS</span><span class="chip">TypeORM</span><span class="chip">Supabase Postgres</span><span class="chip">pg-boss</span><span class="chip">Octokit</span><span class="chip">Swagger</span><span class="chip">Next.js</span><span class="chip">Tailwind</span><span class="chip">shadcn/ui</span><span class="chip">TanStack Query</span><span class="chip">Supabase Auth</span></div>
+  <ol class="tasks">
+    <li><span class="num">Task 15</span><div><h3>API scaffold + database</h3><p>NestJS, TypeORM entities (users, installations, repos, reviews, issues), migrations, local Supabase.</p></div></li>
+    <li><span class="num">Task 16</span><div><h3>Webhook endpoint</h3><p>Verifies GitHub's signature, replies instantly, and queues the review.</p></div></li>
+    <li><span class="num">Task 17</span><div><h3>Installation sync</h3><p>Keeps the repo list in step when the app is installed or removed.</p></div></li>
+    <li><span class="num">Task 18</span><div><h3>Review worker</h3><p>Skips duplicates and drafts, reviews only new commits, posts inline comments and one summary, retries 3 times, and caps each installation at 50 reviews a day.</p></div></li>
+    <li><span class="num">Task 19</span><div><h3>Login + REST API</h3><p>GitHub login via Supabase, links you to your installations, and serves the repos and reviews endpoints.</p></div></li>
+    <li><span class="num">Task 20</span><div><h3>Website + landing page</h3><p>Next.js app at <code>/</code> with "Sign in with GitHub".</p></div></li>
+    <li><span class="num">Task 21</span><div><h3>Repos page</h3><p>Install link, on/off switch, depth and ignore settings.</p></div></li>
+    <li><span class="num">Task 22</span><div><h3>Reviews + settings pages</h3><p>Review history, issues per review, link to the PR, sign out.</p></div></li>
+  </ol>
+  <div class="done"><b>DONE WHEN</b><span>opening a PR gets an automatic review, and it shows up on the website.</span></div>
+  <p class="needs"><strong>You'll need:</strong> a GitHub App (ID, private key, webhook secret, client ID/secret), a Supabase project.</p>
+  <span class="status later">detailed plan written before this phase starts</span>
+</section>
+
+<section class="phase" id="phase-4" aria-labelledby="p4">
+  <div class="phase-head">
+    <span class="tag">Phase 4</span>
+    <h2 id="p4">Deploy: go live</h2>
+    <p>Everything goes online at <code>revio.charanteja.site</code>.</p>
+  </div>
+  <div class="chips"><span class="chip">Cloudflare</span><span class="chip">Supabase (hosted)</span><span class="chip">GitHub Actions</span><span class="chip">Cloudflare Containers or Railway/Fly.io</span></div>
+  <ol class="tasks">
+    <li><span class="num">Task 23</span><div><h3>Hosted database</h3><p>Supabase project, with migrations run automatically before each deploy.</p></div></li>
+    <li><span class="num">Task 24</span><div><h3>Deploy the API</h3><p>At <code>api.revio.charanteja.site</code>; the GitHub App webhook points here. Host chosen with you in this phase.</p></div></li>
+    <li><span class="num">Task 25</span><div><h3>Deploy the website</h3><p>Next.js on Cloudflare at <code>revio.charanteja.site</code>; DNS moved to Cloudflare if needed.</p></div></li>
+    <li><span class="num">Task 26</span><div><h3>Release automation</h3><p>One-click releases for npm, the Marketplace, the API and the website.</p></div></li>
+  </ol>
+  <div class="done"><b>DONE WHEN</b><span>anyone can install the GitHub App and get reviews, running on your Gemini key.</span></div>
+  <p class="needs"><strong>You'll need:</strong> Cloudflare account, <code>charanteja.site</code> DNS on Cloudflare.</p>
+  <span class="status later">detailed plan written before this phase starts</span>
+</section>
+
+<section aria-labelledby="risk-h" style="display:grid; gap:12px;">
+  <h2 id="risk-h">Things most likely to bite, and covered by tests</h2>
+  <ul class="risks">
+    <li><b>Nothing to review</b><span>A clean working tree prints "No changes to review." and never calls Gemini.</span></li>
+    <li><b>Deleted, renamed and binary files</b><span>Skipped quietly; they never crash the parser.</span></li>
+    <li><b>Gemini down, rate-limited or bad key</b><span>One readable error line; the watcher keeps running.</span></li>
+    <li><b>Not a git repo</b><span>"Revio needs a git repository." with exit code 2.</span></li>
+    <li><b>Duplicate webhooks and force-pushes</b><span>The same commit is never reviewed twice; falls back to the full PR diff when needed.</span></li>
+  </ul>
+</section>
+
+<footer>
+  <span>Full step-by-step plan: <code>docs/superpowers/plans/2026-10-30-revio.md</code></span>
+  <span>Design: <code>docs/superpowers/specs/2026-10-30-revio-design.md</code></span>
+</footer>
+
+</main>
+</body>
+</html>
