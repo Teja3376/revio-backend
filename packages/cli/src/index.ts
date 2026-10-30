@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command, CommanderError, Option } from "commander";
-import { runReview } from "./commands/review";
+import { clientFromEnv, runReview } from "./commands/review";
+import { startWatch } from "./commands/watch";
 
 const depthOption = () =>
   new Option("-d, --depth <depth>", "review depth").choices(["quick", "normal", "full"]);
@@ -31,6 +32,32 @@ program
       env: process.env,
       out: (s) => console.log(s),
     });
+  });
+
+program
+  .command("watch")
+  .description("Quietly review each file when you save it.")
+  .addOption(depthOption())
+  .action(async (opts) => {
+    const client = clientFromEnv(process.env);
+    if (!client) {
+      console.log("Set GEMINI_API_KEY to use Revio.");
+      process.exitCode = 2;
+      return;
+    }
+    try {
+      const w = await startWatch({
+        cwd: process.cwd(),
+        depth: opts.depth,
+        client,
+        out: (s) => console.log(s),
+      });
+      console.log(`Revio watching ${w.root} (quick review on save). Ctrl+C to stop.`);
+      process.once("SIGINT", () => void w.stop().then(() => process.exit(0)));
+    } catch (e) {
+      console.log((e as Error).message);
+      process.exitCode = 2;
+    }
   });
 
 try {
