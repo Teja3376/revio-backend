@@ -69,4 +69,17 @@ describe("CommitWatcher", () => {
     await Promise.all([w.check(), w.check(), w.check()]);
     expect(onCommit).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps working after a failed check", async () => {
+    let head = "b";
+    const onCommit = vi.fn();
+    const parentOf = vi.fn(async (sha: string) => PARENTS[sha]);
+    const w = new CommitWatcher({ getHead: () => head, parentOf, onCommit });
+    await w.check();
+    head = "c";
+    parentOf.mockRejectedValueOnce(new Error("git busy"));
+    await w.check().catch(() => {});
+    await w.check();
+    expect(onCommit).toHaveBeenCalledWith("c");
+  });
 });

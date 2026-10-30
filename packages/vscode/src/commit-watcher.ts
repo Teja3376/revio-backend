@@ -18,7 +18,7 @@ export class CommitWatcher {
 
   /** Serialized: VS Code fires change events in bursts. */
   check(): Promise<void> {
-    this.queue = this.queue.then(() => this.run());
+    this.queue = this.queue.catch(() => {}).then(() => this.run());
     return this.queue;
   }
 
