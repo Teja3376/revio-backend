@@ -10,7 +10,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "scripts": {
     "build": "tsup",
@@ -18,12 +18,32 @@
     "typecheck": "tsc -p ."
   },
   "dependencies": {
+    "@google/genai": "^2.31.0",
     "chokidar": "^6.0.0",
     "commander": "^15.0.0",
-    "picocolors": "^1.1.1"
+    "picocolors": "^1.1.1",
+    "picomatch": "^4.0.7",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@revio/core": "workspace:*",
-    "@revio/types": "workspace:*"
+    "@revio/types": "workspace:*",
+    "tsup": "^9.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "ai",
+    "gemini",
+    "cli",
+    "git"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teja3376/revio-backend.git",
+    "directory": "packages/cli"
   }
 }
