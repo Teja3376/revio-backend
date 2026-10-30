@@ -9,6 +9,7 @@
     "typecheck": "tsc -p ."
   },
   "dependencies": {
+    "@google/genai": "^2.31.0",
     "@revio/types": "workspace:*",
     "picomatch": "^4.0.7"
   },
