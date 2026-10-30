@@ -1,0 +1,86 @@
+{
+  "name": "revio-vscode",
+  "displayName": "Revio: AI Code Review",
+  "description": "Reviews every commit in the background and underlines real problems, with one-click fixes.",
+  "version": "0.1.0",
+  "publisher": "charanteja",
+  "private": true,
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Teja3376/revio-backend.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "code review",
+    "ai",
+    "gemini",
+    "git"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "revio.setApiKey",
+        "title": "Set Gemini API Key",
+        "category": "Revio"
+      },
+      {
+        "command": "revio.reviewLastCommit",
+        "title": "Review Last Commit",
+        "category": "Revio"
+      },
+      {
+        "command": "revio.clearIssues",
+        "title": "Clear Issues",
+        "category": "Revio"
+      }
+    ],
+    "configuration": {
+      "title": "Revio",
+      "properties": {
+        "revio.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Review each new commit automatically."
+        },
+        "revio.depth": {
+          "type": "string",
+          "enum": [
+            "quick",
+            "normal",
+            "full"
+          ],
+          "default": "normal",
+          "description": "How deep commit reviews go. quick: bugs and security. normal: plus performance and quality. full: plus style."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc -p .",
+    "package": "pnpm build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@revio/core": "workspace:*",
+    "@revio/types": "workspace:*",
+    "@types/vscode": "1.90.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.28.2"
+  }
+}
