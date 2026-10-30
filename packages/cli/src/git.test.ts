@@ -2,7 +2,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { getDiff, NotAGitRepoError, repoRoot } from "./git";
+import { GitError, getDiff, NotAGitRepoError, repoRoot } from "./git";
 import { git, tempRepo } from "./test-utils";
 
 describe("getDiff", () => {
@@ -70,5 +70,27 @@ describe("repoRoot", () => {
   it("returns the top-level directory", async () => {
     const dir = tempRepo();
     expect(await repoRoot(dir)).toMatch(/revio-git-/);
+  });
+});
+
+describe("getDiff edge cases", () => {
+  it("never diffs a gitignored file, even when named", async () => {
+    const dir = tempRepo();
+    writeFileSync(join(dir, ".gitignore"), ".env\n");
+    writeFileSync(join(dir, ".env"), "SECRET=1\n");
+    expect(await getDiff({ cwd: dir, file: join(dir, ".env") })).toBe("");
+  });
+
+  it("throws GitError with git's message for a bad base", async () => {
+    const p = getDiff({ cwd: tempRepo(), base: "nope" });
+    await expect(p).rejects.toBeInstanceOf(GitError);
+    await expect(p).rejects.toThrow(/nope/);
+  });
+
+  it("keeps non-ASCII paths readable", async () => {
+    const dir = tempRepo();
+    writeFileSync(join(dir, "é.ts"), "x\n");
+    git(dir, "add", ".");
+    expect(await getDiff({ cwd: dir, staged: true })).toContain("+++ b/é.ts");
   });
 });

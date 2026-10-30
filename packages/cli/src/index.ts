@@ -96,7 +96,7 @@ hook
 try {
   await program.parseAsync();
 } catch (e) {
-  if (!(e instanceof CommanderError)) throw e;
-  // help and --version exit 0; every usage error is exit 2
-  process.exitCode = e.exitCode === 0 ? 0 : 2;
+  // help and --version exit 0; usage and unexpected errors exit 2 (1 means "issues found")
+  if (!(e instanceof CommanderError)) console.error(`Revio failed: ${(e as Error).message}`);
+  process.exitCode = e instanceof CommanderError && e.exitCode === 0 ? 0 : 2;
 }

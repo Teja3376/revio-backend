@@ -9,7 +9,7 @@ import {
   type Severity,
 } from "@revio/core";
 import { formatIssues, useColor } from "../format";
-import { getDiff, NotAGitRepoError, repoRoot } from "../git";
+import { GitError, getDiff, NotAGitRepoError, repoRoot } from "../git";
 
 export type ReviewOptions = {
   cwd: string;
@@ -51,7 +51,12 @@ export async function runReview(opts: ReviewOptions): Promise<0 | 1 | 2> {
     const block = opts.blockOn;
     return block && result.issues.some((i) => RANK[i.severity] >= RANK[block]) ? 1 : 0;
   } catch (e) {
-    if (e instanceof NotAGitRepoError || e instanceof ReviewError || e instanceof ConfigError) {
+    if (
+      e instanceof NotAGitRepoError ||
+      e instanceof ReviewError ||
+      e instanceof ConfigError ||
+      e instanceof GitError
+    ) {
       out(e.message);
       return 2;
     }

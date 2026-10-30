@@ -44,12 +44,11 @@ export function toReviewError(e: unknown): ReviewError {
   if (e instanceof ReviewError) return e;
   const err = e as { status?: number; message?: string; name?: string };
   let kind: ReviewErrorKind = "unknown";
+  if (err.name === "AbortError" || /timed? ?out/i.test(err.message ?? ""))
+    return new ReviewError("network", "Gemini did not respond in time. Try again.");
   if (err.status === 401 || err.status === 403 || /api key/i.test(err.message ?? "")) kind = "auth";
   else if (err.status === 429) kind = "rate_limit";
-  else if (
-    err.name === "TypeError" ||
-    /fetch failed|ECONN|ENOTFOUND|ETIMEDOUT/.test(err.message ?? "")
-  )
+  else if (/fetch failed|ECONN|ENOTFOUND|EAI_AGAIN|socket hang up/.test(err.message ?? ""))
     kind = "network";
   const reason = apiMessage(err.message);
   const status = err.status ? ` (${err.status})` : "";
@@ -58,7 +57,8 @@ export function toReviewError(e: unknown): ReviewError {
 }
 
 export function createGeminiClient(apiKey: string): ModelClient {
-  const ai = new GoogleGenAI({ apiKey });
+  // The SDK has no default timeout; without one a stalled network hangs the pre-commit hook.
+  const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: 60_000 } });
   return {
     async generate({ model, prompt, jsonSchema }) {
       const res = await ai.models.generateContent({

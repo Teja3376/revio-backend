@@ -3,21 +3,24 @@ import { join } from "node:path";
 import { ReviewError } from "@revio/core";
 import { describe, expect, it, vi } from "vitest";
 import { tempRepo } from "../test-utils";
-import { startWatch } from "./watch";
+import { isIgnoredPath, startWatch } from "./watch";
 
 const DEBOUNCE = 40;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const settle = () => sleep(DEBOUNCE * 6);
 
 function fakeWatcher() {
-  const handlers: ((p: string) => void)[] = [];
+  const handlers: Record<string, ((arg: never) => void)[]> = {};
   return {
-    on: (_ev: "change" | "add", cb: (p: string) => void) => {
-      handlers.push(cb);
+    on: (ev: string, cb: (arg: never) => void) => {
+      handlers[ev] = [...(handlers[ev] ?? []), cb];
     },
     close: async () => {},
     emit: (p: string) => {
-      for (const h of handlers) h(p);
+      for (const h of [...(handlers.change ?? []), ...(handlers.add ?? [])]) h(p as never);
+    },
+    fail: (e: Error) => {
+      for (const h of handlers.error ?? []) h(e as never);
     },
   };
 }
@@ -118,5 +121,35 @@ describe("startWatch", () => {
     await stop();
     await settle();
     expect(generate).not.toHaveBeenCalled();
+  });
+});
+
+describe("watch safety", () => {
+  it("never sends gitignored files like .env to the model", async () => {
+    const { dir, generate, save, stop } = await setup();
+    writeFileSync(join(dir, ".gitignore"), ".env\n");
+    save(".env", "SECRET=1\n");
+    await settle();
+    expect(generate).not.toHaveBeenCalled();
+    await stop();
+  });
+
+  it("prints watcher errors and keeps running", async () => {
+    const { watcher, save, lines, stop } = await setup();
+    watcher.fail(new Error("EMFILE: too many open files"));
+    expect(lines).toEqual(["Revio watch error: EMFILE: too many open files"]);
+    save("a.ts", "export const a = 2;\n");
+    await settle();
+    expect(lines.join("\n")).toContain("Bad");
+    await stop();
+  });
+});
+
+describe("isIgnoredPath", () => {
+  it("checks paths relative to the repo root", () => {
+    expect(isIgnoredPath("/home/me/build/app", "/home/me/build/app/src/a.ts")).toBe(false);
+    expect(isIgnoredPath("/home/me/app", "/home/me/app/node_modules/x/i.js")).toBe(true);
+    expect(isIgnoredPath("/home/me/app", "/home/me/app/.git/HEAD")).toBe(true);
+    expect(isIgnoredPath("/home/me/app", "/home/me/app/dist/a.js")).toBe(true);
   });
 });

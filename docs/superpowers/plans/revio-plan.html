@@ -6,7 +6,7 @@
 <title>Revio Build Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   /* layout: a five-stop phase rail up top, then one section per phase, read top to bottom like a diff */
@@ -21,9 +21,9 @@
   --add-soft: #e3f3e9;
   --warn: #9a5b00;
   --warn-soft: #fbefdc;
-  --font-display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Edu NSW ACT Cursive", cursive;
+  --font-body: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Poppins", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -45,6 +45,8 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: bal
 h1 { font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -0.02em; }
 h2 { font-size: 1.5rem; letter-spacing: -0.01em; }
 h3 { font-size: 1rem; font-family: var(--font-body); font-weight: 600; }
+h2 { font-family: var(--font-body); font-weight: 600; }
+h1 { font-weight: 700; }
 p { margin: 0; max-width: 65ch; }
 code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
 a { color: var(--accent); }
@@ -139,7 +141,7 @@ footer { color: var(--muted); font-size: 0.88rem; display: grid; gap: 4px; }
     <h2 id="p0">Foundation: the shared review engine</h2>
     <p>The monorepo and <code>packages/core</code>, which turns a git diff into a validated list of issues using Gemini.</p>
   </div>
-  <div class="chips"><span class="chip">TypeScript</span><span class="chip">Node 20+</span><span class="chip">pnpm</span><span class="chip">Turborepo</span><span class="chip">@google/genai</span><span class="chip">zod</span><span class="chip">picomatch</span><span class="chip">vitest</span><span class="chip">Biome</span><span class="chip">GitHub Actions</span></div>
+  <div class="chips"><span class="chip">TypeScript</span><span class="chip">Node 22.12+</span><span class="chip">pnpm</span><span class="chip">Turborepo</span><span class="chip">@google/genai</span><span class="chip">zod</span><span class="chip">picomatch</span><span class="chip">vitest</span><span class="chip">Biome</span><span class="chip">GitHub Actions</span></div>
   <ol class="tasks">
     <li><span class="num">Task 1</span><div><h3>Monorepo scaffold + shared types</h3><p>Workspace, CI, and the Issue / Depth / Config types with zod schemas.</p></div></li>
     <li><span class="num">Task 2</span><div><h3>Diff parser</h3><p>Reads git diffs: changed line numbers per file; handles deleted, renamed and binary files.</p></div></li>
@@ -149,7 +151,7 @@ footer { color: var(--muted); font-size: 0.88rem; display: grid; gap: 4px; }
   </ol>
   <div class="done"><b>DONE WHEN</b><span>a diff goes in and a clean list of issues comes out, fully tested.</span></div>
   <p class="needs"><strong>You'll need:</strong> Gemini API key.</p>
-  <span class="status detailed">fully detailed in the plan</span>
+  <span class="status detailed">built · 42 tests passing</span>
 </section>
 
 <section class="phase" id="phase-1" aria-labelledby="p1">
@@ -168,7 +170,7 @@ footer { color: var(--muted); font-size: 0.88rem; display: grid; gap: 4px; }
   </ol>
   <div class="done"><b>DONE WHEN</b><span><code>npm i -g</code> it, run <code>revio watch</code>, and issues appear as you save.</span></div>
   <p class="needs"><strong>You'll need:</strong> npm account.</p>
-  <span class="status detailed">fully detailed in the plan</span>
+  <span class="status detailed">built · 36 tests passing · npm publish pending</span>
 </section>
 
 <section class="phase" id="phase-2" aria-labelledby="p2">

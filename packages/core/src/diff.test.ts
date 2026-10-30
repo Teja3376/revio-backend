@@ -51,3 +51,16 @@ describe("parseDiff", () => {
     expect(parseDiff("")).toEqual([]);
   });
 });
+
+describe("parseDiff paths", () => {
+  it("strips the trailing tab git adds to paths with spaces", () => {
+    const diff = [
+      "diff --git a/my file.txt b/my file.txt",
+      "--- a/my file.txt\t",
+      "+++ b/my file.txt\t",
+      "@@ -1,0 +1,1 @@",
+      "+x",
+    ].join("\n");
+    expect(parseDiff(diff)[0]?.path).toBe("my file.txt");
+  });
+});

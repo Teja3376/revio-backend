@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { relative } from "node:path";
 import { type Depth, loadConfig, type ModelClient, review } from "@revio/core";
 import { watch } from "chokidar";
 import { formatIssues, useColor } from "../format";
@@ -6,6 +7,7 @@ import { getDiff, repoRoot } from "../git";
 
 export type Watcher = {
   on(ev: "change" | "add", cb: (path: string) => void): unknown;
+  on(ev: "error", cb: (err: Error) => void): unknown;
   close(): Promise<void>;
 };
 
@@ -18,7 +20,10 @@ export type WatchOptions = {
   watcher?: Watcher;
 };
 
-const IGNORED = /(^|[/\\])(\.git|node_modules|dist|build|\.turbo)([/\\]|$)/;
+const IGNORED = /(^|[/\\])(\.git|node_modules|dist|build|\.turbo|\.next|coverage)([/\\]|$)/;
+
+/** Relative to the root, so a repo that itself lives under e.g. `build/` is still watched. */
+export const isIgnoredPath = (root: string, p: string) => IGNORED.test(relative(root, p));
 
 /** Reviews each saved file at quick depth (by default) after it stops changing for `debounceMs`. */
 export async function startWatch(
@@ -29,7 +34,7 @@ export async function startWatch(
   const depth = opts.depth ?? config.depth?.cli ?? "quick";
   const debounceMs = opts.debounceMs ?? 2000;
   const watcher =
-    opts.watcher ?? watch(root, { ignored: (p) => IGNORED.test(p), ignoreInitial: true });
+    opts.watcher ?? watch(root, { ignored: (p) => isIgnoredPath(root, p), ignoreInitial: true });
 
   const timers = new Map<string, NodeJS.Timeout>();
   const lastHash = new Map<string, string>();
@@ -68,6 +73,7 @@ export async function startWatch(
   };
   watcher.on("change", onSave);
   watcher.on("add", onSave);
+  watcher.on("error", (e) => opts.out(`Revio watch error: ${e.message}`));
 
   return {
     root,

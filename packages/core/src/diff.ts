@@ -58,7 +58,7 @@ export function parseDiff(diff: string): FileDiff[] {
       file.path = unquote(line.slice("rename to ".length));
     } else if (line.startsWith("Binary files ") || line === "GIT binary patch") file.binary = true;
     else if (line.startsWith("+++ ") && line !== "+++ /dev/null") {
-      file.path = unquote(line.slice(4)).replace(/^b\//, "");
+      file.path = unquote(line.slice(4).replace(/\t$/, "")).replace(/^b\//, ""); // git appends \t to paths with spaces
     }
   }
   flush();

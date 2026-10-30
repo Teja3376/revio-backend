@@ -12,18 +12,27 @@ export class NotAGitRepoError extends Error {
   }
 }
 
+export class GitError extends Error {
+  override name = "GitError";
+}
+
 type GitResult = { stdout: string; code: number };
 
 async function git(cwd: string, args: string[], okCodes = [0]): Promise<GitResult> {
   try {
-    const { stdout } = await run("git", args, { cwd, maxBuffer: 64 * 1024 * 1024 });
+    // quotePath=false keeps non-ASCII paths readable so they match what the model cites
+    const { stdout } = await run("git", ["-c", "core.quotePath=false", ...args], {
+      cwd,
+      maxBuffer: 64 * 1024 * 1024,
+    });
     return { stdout, code: 0 };
   } catch (e) {
-    const err = e as { code?: number | string; stdout?: string };
+    const err = e as { code?: number | string; stdout?: string; stderr?: string; message: string };
     if (typeof err.code === "number" && okCodes.includes(err.code)) {
       return { stdout: err.stdout ?? "", code: err.code };
     }
-    throw e;
+    if (err.code === "ENOENT") throw e; // git not installed
+    throw new GitError(`git ${args[0]} failed: ${(err.stderr || err.message).trim()}`);
   }
 }
 
@@ -59,6 +68,8 @@ export async function getDiff(opts: DiffOptions): Promise<string> {
   const flags = ["diff", "--no-color", "--no-ext-diff"];
 
   if (file && !(await isTracked(root, file))) {
+    // never read gitignored files (.env, build output): they must not be sent to the model
+    if ((await git(root, ["check-ignore", "-q", "--", file], [0, 1])).code === 0) return "";
     // --no-index exits 1 when files differ
     return (await git(root, [...flags, "--no-index", "--", "/dev/null", file], [0, 1])).stdout;
   }

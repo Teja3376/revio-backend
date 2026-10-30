@@ -124,3 +124,11 @@ describe("runReview", () => {
     expect(await prompts("normal", { depth: { cli: "quick" } })).toContain("performance");
   });
 });
+
+describe("runReview git failures", () => {
+  it("exits 2 with git's message for a bad base", async () => {
+    const { client, lines, out } = setup();
+    expect(await runReview({ cwd: tempRepo(), env, base: "nope", client, out })).toBe(2);
+    expect(lines.join("\n")).toMatch(/nope/);
+  });
+});
