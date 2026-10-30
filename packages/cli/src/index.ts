@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Command, CommanderError, Option } from "commander";
+import { installHook, uninstallHook } from "./commands/hook";
 import { clientFromEnv, runReview } from "./commands/review";
 import { startWatch } from "./commands/watch";
 
@@ -59,6 +60,38 @@ program
       process.exitCode = 2;
     }
   });
+
+const hook = program.command("hook").description("Run Revio before every git commit.");
+
+const runHook = (fn: () => Promise<void>) => async () => {
+  try {
+    await fn();
+  } catch (e) {
+    console.log((e as Error).message);
+    process.exitCode = 2;
+  }
+};
+
+hook
+  .command("install")
+  .description("Add a pre-commit check (warns only, unless --block-on is set).")
+  .addOption(blockOption())
+  .action((opts) =>
+    runHook(async () => {
+      const file = await installHook(process.cwd(), { blockOn: opts.blockOn });
+      console.log(`Revio pre-commit hook installed at ${file}`);
+    })(),
+  );
+
+hook
+  .command("uninstall")
+  .description("Remove the Revio pre-commit check.")
+  .action(
+    runHook(async () => {
+      await uninstallHook(process.cwd());
+      console.log("Revio pre-commit hook removed.");
+    }),
+  );
 
 try {
   await program.parseAsync();
