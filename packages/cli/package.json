@@ -1,0 +1,25 @@
+{
+  "name": "@revio/cli",
+  "version": "0.1.0",
+  "description": "AI code review in your terminal: quiet reviews on save, on demand, or before commit.",
+  "type": "module",
+  "bin": {
+    "revio": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@revio/core": "workspace:*",
+    "@revio/types": "workspace:*"
+  }
+}
