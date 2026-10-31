@@ -20,17 +20,20 @@ pnpm start                # http://localhost:4000
 
 ## Create the GitHub App
 
+Quickest: `node scripts/create-github-app.mjs --webhook <smee.io URL>` registers the app from a manifest and writes its credentials into `.env`. Or by hand:
+
 GitHub → Settings → Developer settings → GitHub Apps → New GitHub App:
 
-| Setting                   | Value                                                                            |
-| ------------------------- | -------------------------------------------------------------------------------- |
-| Homepage URL              | `https://revio.charanteja.site`                                                  |
-| Callback URL              | Supabase's GitHub callback: `https://<project-ref>.supabase.co/auth/v1/callback` |
-| Webhook URL               | `https://api.revio.charanteja.site/webhooks/github`                              |
-| Webhook secret            | any long random string → `GITHUB_WEBHOOK_SECRET`                                 |
-| Repository permissions    | Pull requests: Read and write · Contents: Read-only · Metadata: Read-only        |
-| Subscribe to events       | Pull request                                                                     |
-| Where can it be installed | Any account                                                                      |
+| Setting                   | Value                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------ |
+| Homepage URL              | `https://revio.charanteja.site`                                                                  |
+| Callback URL              | Supabase's GitHub callback: `https://<project-ref>.supabase.co/auth/v1/callback`                 |
+| Webhook URL               | `https://api.revio.charanteja.site/webhooks/github`                                              |
+| Webhook secret            | any long random string → `GITHUB_WEBHOOK_SECRET`                                                 |
+| Repository permissions    | Pull requests: Read and write · Contents: Read-only · Metadata: Read-only                        |
+| Account permissions       | Email addresses: Read-only (Supabase sign-in fails with "Error getting user profile" without it) |
+| Subscribe to events       | Pull request                                                                                     |
+| Where can it be installed | Any account                                                                                      |
 
 Installation events are sent automatically. Then generate a private key (→ `GITHUB_PRIVATE_KEY`, newlines may be written as `\n`), note the App ID (→ `GITHUB_APP_ID`), and generate a client secret. Put the app's client ID and secret into Supabase → Authentication → Providers → GitHub, so signing in to the dashboard uses the GitHub App.
 
