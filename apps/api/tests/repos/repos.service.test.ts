@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { ReposService } from "../../src/repos/repos.service";
 import { ME, STRANGER, seedDashboard } from "../dashboard.test-seed";
 import { testDb } from "../database/test-db";
-import { ReposService } from "./repos.service";
 
 let db: Awaited<ReturnType<typeof testDb>>;
 let repos: Awaited<ReturnType<typeof seedDashboard>>;

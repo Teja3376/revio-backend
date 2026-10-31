@@ -1,9 +1,9 @@
 import type { Issue } from "@revio/types";
 import { describe, expect, it, vi } from "vitest";
-import { parseDiff } from "./diff";
-import { ReviewError } from "./model";
-import { buildPrompt } from "./prompt";
-import { review } from "./review";
+import { parseDiff } from "../src/diff";
+import { ReviewError } from "../src/model";
+import { buildPrompt } from "../src/prompt";
+import { review } from "../src/review";
 
 const diffFor = (path: string, added: string[], start = 1) =>
   [

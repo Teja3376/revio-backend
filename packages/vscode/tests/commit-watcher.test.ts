@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { CommitWatcher } from "./commit-watcher";
+import { CommitWatcher } from "../src/commit-watcher";
 
 // a -> b -> c is one line of history; x is unrelated; b2 is an amend of b (same parent a)
 const PARENTS: Record<string, string | undefined> = {

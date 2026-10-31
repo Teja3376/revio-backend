@@ -2,11 +2,11 @@ import type { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { JWT_VERIFIER, SupabaseJwtGuard } from "./auth/jwt.guard";
-import { ReposController } from "./repos/repos.controller";
-import { ReposService } from "./repos/repos.service";
-import { ReviewsController } from "./reviews/reviews.controller";
-import { ReviewsService } from "./reviews/reviews.service";
+import { JWT_VERIFIER, SupabaseJwtGuard } from "../src/auth/jwt.guard";
+import { ReposController } from "../src/repos/repos.controller";
+import { ReposService } from "../src/repos/repos.service";
+import { ReviewsController } from "../src/reviews/reviews.controller";
+import { ReviewsService } from "../src/reviews/reviews.service";
 
 const ME = "5f0c1f9e-1d1a-4b0e-9a49-3f1f3b1f6a10";
 const ID = "11111111-2222-4333-8444-555555555555";

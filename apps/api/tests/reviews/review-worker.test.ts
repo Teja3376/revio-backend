@@ -1,10 +1,10 @@
 import type { ModelClient } from "@revio/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Db } from "../database/db";
+import type { Db } from "../../src/database/db";
+import { SUMMARY_MARKER } from "../../src/reviews/comment-format";
+import type { PrGithub } from "../../src/reviews/pr-github";
+import { ReviewWorker } from "../../src/reviews/review-worker";
 import { testDb } from "../database/test-db";
-import { SUMMARY_MARKER } from "./comment-format";
-import type { PrGithub } from "./pr-github";
-import { ReviewWorker } from "./review-worker";
 
 const DIFF = `diff --git a/src/a.ts b/src/a.ts
 new file mode 100644

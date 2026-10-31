@@ -3,8 +3,8 @@ import { Test } from "@nestjs/testing";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from "jose";
 import request from "supertest";
 import { afterAll, beforeAll, describe, it } from "vitest";
-import { type AuthUser, CurrentUser } from "./current-user";
-import { JWT_VERIFIER, jwtVerifier, SupabaseJwtGuard } from "./jwt.guard";
+import { type AuthUser, CurrentUser } from "../../src/auth/current-user";
+import { JWT_VERIFIER, jwtVerifier, SupabaseJwtGuard } from "../../src/auth/jwt.guard";
 
 @Controller("whoami")
 @UseGuards(SupabaseJwtGuard)

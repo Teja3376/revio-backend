@@ -1,6 +1,6 @@
 import type { Issue } from "@revio/types";
 import { describe, expect, it } from "vitest";
-import { formatIssues } from "./format";
+import { formatIssues } from "../src/format";
 
 const ANSI = "\u001b[";
 

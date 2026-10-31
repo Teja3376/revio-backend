@@ -3,9 +3,9 @@ import { Test } from "@nestjs/testing";
 import { sign } from "@octokit/webhooks-methods";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { ENV } from "../config/env";
-import { INSTALLATION_EVENTS, REVIEW_QUEUE } from "./tokens";
-import { WebhooksController } from "./webhooks.controller";
+import { ENV } from "../../src/config/env";
+import { INSTALLATION_EVENTS, REVIEW_QUEUE } from "../../src/github/tokens";
+import { WebhooksController } from "../../src/github/webhooks.controller";
 
 const SECRET = "hook-secret";
 const queue = { enqueue: vi.fn() };

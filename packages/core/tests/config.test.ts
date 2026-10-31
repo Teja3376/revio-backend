@@ -2,7 +2,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ConfigError, loadConfig } from "./config";
+import { ConfigError, loadConfig } from "../src/config";
 
 const dirWith = (content?: string) => {
   const dir = mkdtempSync(join(tmpdir(), "revio-cfg-"));

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { PgBossReviewQueue, QUEUE_NAME } from "./queue";
+import { PgBossReviewQueue, QUEUE_NAME } from "../../src/reviews/queue";
 
 function fakeBoss() {
   return {

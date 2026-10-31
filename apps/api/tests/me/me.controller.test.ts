@@ -2,9 +2,9 @@ import type { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { JWT_VERIFIER, SupabaseJwtGuard } from "../auth/jwt.guard";
-import { InstallationsService } from "../installations/installations.service";
-import { MeController } from "./me.controller";
+import { JWT_VERIFIER, SupabaseJwtGuard } from "../../src/auth/jwt.guard";
+import { InstallationsService } from "../../src/installations/installations.service";
+import { MeController } from "../../src/me/me.controller";
 
 const USER = "5f0c1f9e-1d1a-4b0e-9a49-3f1f3b1f6a10";
 const svc = { me: vi.fn(), linkUser: vi.fn() };

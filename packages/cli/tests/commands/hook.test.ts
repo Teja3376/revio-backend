@@ -8,8 +8,8 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { installHook, uninstallHook } from "../../src/commands/hook";
 import { git, tempRepo } from "../test-utils";
-import { installHook, uninstallHook } from "./hook";
 
 const hookPath = (dir: string) => join(dir, ".git", "hooks", "pre-commit");
 const read = (dir: string) => readFileSync(hookPath(dir), "utf8");

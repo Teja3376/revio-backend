@@ -1,7 +1,7 @@
 import { PGlite } from "@electric-sql/pglite";
 import type { QueryRunner } from "typeorm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { Init1761900000000 } from "./migrations/1761900000000-init";
+import { Init1761900000000 } from "../../src/database/migrations/1761900000000-init";
 
 // Runs the hand-written migration on a real Postgres (PGlite, in this process).
 const db = new PGlite();

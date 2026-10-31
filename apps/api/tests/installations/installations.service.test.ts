@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { Db } from "../database/db";
+import type { Db } from "../../src/database/db";
+import {
+  type GithubUserApi,
+  InstallationsService,
+} from "../../src/installations/installations.service";
 import { testDb } from "../database/test-db";
-import { type GithubUserApi, InstallationsService } from "./installations.service";
 
 const account = { login: "teja", type: "User" };
 const USER = "5f0c1f9e-1d1a-4b0e-9a49-3f1f3b1f6a10";

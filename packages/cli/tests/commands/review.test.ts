@@ -3,8 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ReviewError } from "@revio/core";
 import { describe, expect, it, vi } from "vitest";
+import { runReview } from "../../src/commands/review";
 import { tempRepo } from "../test-utils";
-import { runReview } from "./review";
 
 const changedRepo = () => {
   const dir = tempRepo();

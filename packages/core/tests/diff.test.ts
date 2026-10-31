@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { parseDiff } from "./diff";
+import { parseDiff } from "../src/diff";
 
 const fixture = (name: string) =>
-  readFileSync(new URL(`../test/fixtures/${name}.diff`, import.meta.url), "utf8");
+  readFileSync(new URL(`./fixtures/${name}.diff`, import.meta.url), "utf8");
 
 describe("parseDiff", () => {
   it("records new-file line numbers of added lines", () => {

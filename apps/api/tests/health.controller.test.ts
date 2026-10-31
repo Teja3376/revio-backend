@@ -2,7 +2,7 @@ import type { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, describe, it } from "vitest";
-import { HealthController } from "./health.controller";
+import { HealthController } from "../src/health.controller";
 
 describe("GET /health", () => {
   let app: INestApplication;

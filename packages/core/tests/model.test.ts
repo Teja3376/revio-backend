@@ -10,7 +10,7 @@ vi.mock("@google/genai", () => ({
   },
 }));
 
-const { createGeminiClient, toReviewError } = await import("./model");
+const { createGeminiClient, toReviewError } = await import("../src/model");
 
 describe("createGeminiClient", () => {
   it("sets a request timeout so a stalled network cannot hang a commit", () => {

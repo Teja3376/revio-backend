@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { FileDiff } from "./diff";
-import { categoriesFor, filterFiles } from "./filter";
+import type { FileDiff } from "../src/diff";
+import { categoriesFor, filterFiles } from "../src/filter";
 
 const f = (path: string, extra: Partial<FileDiff> = {}): FileDiff => ({
   path,

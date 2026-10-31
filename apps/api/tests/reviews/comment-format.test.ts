@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { capReachedComment, inlineComment, SUMMARY_MARKER, summaryComment } from "./comment-format";
+import {
+  capReachedComment,
+  inlineComment,
+  SUMMARY_MARKER,
+  summaryComment,
+} from "../../src/reviews/comment-format";
 
 describe("inlineComment", () => {
   it("leads with category and severity, then the message", () => {

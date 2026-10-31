@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { githubUserApi } from "./github-user-api";
+import { githubUserApi } from "../../src/github/github-user-api";
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
 

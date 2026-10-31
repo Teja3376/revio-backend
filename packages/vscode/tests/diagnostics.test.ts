@@ -1,7 +1,7 @@
 import type { Issue } from "@revio/types";
 import { describe, expect, it } from "vitest";
 import { DiagnosticSeverity, type Range } from "vscode";
-import { fixFor, groupByFile, toDiagnostic } from "./diagnostics";
+import { fixFor, groupByFile, toDiagnostic } from "../src/diagnostics";
 
 const issue = (over: Partial<Issue> = {}): Issue => ({
   file: "src/a.ts",

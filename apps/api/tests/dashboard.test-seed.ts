@@ -1,4 +1,4 @@
-import type { Db } from "./database/db";
+import type { Db } from "../src/database/db";
 
 export const ME = "5f0c1f9e-1d1a-4b0e-9a49-3f1f3b1f6a10";
 export const STRANGER = "0b7a3c1e-2f4d-4e6a-8b9c-1d2e3f4a5b6c";

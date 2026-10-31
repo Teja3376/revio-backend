@@ -2,9 +2,9 @@ import type { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, describe, it } from "vitest";
-import { AppModule, DATA_SOURCE } from "./app.module";
-import { ENV, loadEnv } from "./config/env";
-import { PG_BOSS } from "./reviews/queue";
+import { AppModule, DATA_SOURCE } from "../src/app.module";
+import { ENV, loadEnv } from "../src/config/env";
+import { PG_BOSS } from "../src/reviews/queue";
 
 const env = loadEnv({
   DATABASE_URL: "postgresql://u:p@localhost:6543/postgres",

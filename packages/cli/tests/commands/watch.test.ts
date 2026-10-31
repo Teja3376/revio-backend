@@ -2,12 +2,14 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ReviewError } from "@revio/core";
 import { describe, expect, it, vi } from "vitest";
+import { isIgnoredPath, startWatch } from "../../src/commands/watch";
 import { tempRepo } from "../test-utils";
-import { isIgnoredPath, startWatch } from "./watch";
 
 const DEBOUNCE = 40;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const settle = () => sleep(DEBOUNCE * 6);
+// Reviews run git; under CI load that can take far longer than the debounce, so wait for the outcome.
+const until = (check: () => void) => vi.waitFor(check, { timeout: 5000, interval: 20 });
 
 function fakeWatcher() {
   const handlers: Record<string, ((arg: never) => void)[]> = {};
@@ -58,9 +60,9 @@ describe("startWatch", () => {
     save("a.ts", "export const a = 2;\n");
     save("a.ts", "export const a = 3;\n");
     save("a.ts", "export const a = 4;\n");
+    await until(() => expect(lines.join("\n")).toContain("Bad"));
     await settle();
     expect(generate).toHaveBeenCalledTimes(1);
-    expect(lines.join("\n")).toContain("Bad");
     await stop();
   });
 
@@ -68,15 +70,14 @@ describe("startWatch", () => {
     const { generate, save, stop } = await setup();
     save("a.ts", "export const a = 2;\n");
     save("b.ts", "export const b = 1;\n");
-    await settle();
-    expect(generate).toHaveBeenCalledTimes(2);
+    await until(() => expect(generate).toHaveBeenCalledTimes(2));
     await stop();
   });
 
   it("skips a save whose diff has not changed", async () => {
     const { generate, save, stop } = await setup();
     save("a.ts", "export const a = 2;\n");
-    await settle();
+    await until(() => expect(generate).toHaveBeenCalledTimes(1));
     save("a.ts", "export const a = 2;\n");
     await settle();
     expect(generate).toHaveBeenCalledTimes(1);
@@ -107,11 +108,9 @@ describe("startWatch", () => {
       .mockResolvedValue(issues());
     const { save, lines, stop } = await setup(generate);
     save("a.ts", "export const a = 2;\n");
-    await settle();
-    expect(lines).toEqual(["Could not reach Gemini."]);
+    await until(() => expect(lines).toEqual(["Could not reach Gemini."]));
     save("a.ts", "export const a = 5;\n");
-    await settle();
-    expect(lines.join("\n")).toContain("Bad");
+    await until(() => expect(lines.join("\n")).toContain("Bad"));
     await stop();
   });
 
@@ -139,8 +138,7 @@ describe("watch safety", () => {
     watcher.fail(new Error("EMFILE: too many open files"));
     expect(lines).toEqual(["Revio watch error: EMFILE: too many open files"]);
     save("a.ts", "export const a = 2;\n");
-    await settle();
-    expect(lines.join("\n")).toContain("Bad");
+    await until(() => expect(lines.join("\n")).toContain("Bad"));
     await stop();
   });
 });

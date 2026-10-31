@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { IssueSchema, RevioConfigSchema } from "./index";
+import { IssueSchema, RevioConfigSchema } from "../src/index";
 
 const issue = { file: "src/a.ts", line: 3, severity: "error", category: "bug", message: "x" };
 

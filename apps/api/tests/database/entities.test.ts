@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { getMetadataArgsStorage } from "typeorm";
 import { describe, expect, it } from "vitest";
-import { ENTITIES } from "./entities";
+import { ENTITIES } from "../../src/database/entities";
 
 const storage = getMetadataArgsStorage();
 const tableOf = (target: unknown) => storage.tables.find((t) => t.target === target)?.name;

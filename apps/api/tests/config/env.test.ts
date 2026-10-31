@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadEnv } from "./env";
+import { loadEnv } from "../../src/config/env";
 
 const base = {
   DATABASE_URL: "postgresql://u:p@h:6543/postgres",

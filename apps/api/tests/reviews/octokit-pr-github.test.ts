@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { SUMMARY_MARKER } from "./comment-format";
-import { prGithubFromOctokit } from "./octokit-pr-github";
+import { SUMMARY_MARKER } from "../../src/reviews/comment-format";
+import { prGithubFromOctokit } from "../../src/reviews/octokit-pr-github";
 
 function fakeOctokit() {
   return {
