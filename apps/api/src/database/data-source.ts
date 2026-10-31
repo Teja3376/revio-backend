@@ -14,6 +14,3 @@ export function createDataSource(url: string) {
     ssl: url.includes("supabase.com") ? { rejectUnauthorized: false } : undefined,
   });
 }
-
-/** For the TypeORM CLI (`pnpm migration:run`): migrations need the session pooler. */
-export default createDataSource(process.env.DIRECT_URL ?? "");
