@@ -26,9 +26,8 @@ const toDto = (r: Row): RepoDto => ({
   ignoreGlobs: r.ignore_globs,
 });
 
-// A repo is visible to a user through one of their installations.
-const MINE =
-  "r.installation_id in (select installation_id from user_installations where user_id = $1)";
+// Visible only if GitHub lets the user see the repo (linked per repo, not per installation).
+const MINE = "r.id in (select repo_id from user_repos where user_id = $1)";
 
 @Injectable()
 export class ReposService {

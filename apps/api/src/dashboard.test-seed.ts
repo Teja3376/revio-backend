@@ -37,9 +37,19 @@ export async function seedDashboard(db: Db) {
         [inst, gid, name],
       )
     )[0]?.id as string;
-  return {
+  const out = {
     one: await repo(ids.a as string, 101, "a/one"),
     two: await repo(ids.a as string, 102, "a/two"),
     secret: await repo(ids.z as string, 201, "z/secret"),
+    // in ME's installation, but GitHub doesn't let ME see it
+    hidden: await repo(ids.a as string, 103, "a/hidden"),
   };
+  for (const [user, repoId] of [
+    [ME, out.one],
+    [ME, out.two],
+    [STRANGER, out.secret],
+  ]) {
+    await db.query("insert into user_repos (user_id, repo_id) values ($1, $2)", [user, repoId]);
+  }
+  return out;
 }

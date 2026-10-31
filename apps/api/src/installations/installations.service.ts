@@ -9,6 +9,11 @@ export interface GithubUserApi {
   listInstallations(
     token: string,
   ): Promise<{ id: number; account: { login: string; type: string } }[]>;
+  /** The repos in an installation that this user can see. */
+  listInstallationRepos(
+    token: string,
+    installationId: number,
+  ): Promise<{ id: number; full_name: string }[]>;
 }
 export const GITHUB_USER_API = Symbol("GITHUB_USER_API");
 
@@ -31,19 +36,24 @@ export class InstallationsService implements InstallationEvents {
     }
     if (e.action === "suspend") return;
     const id = await this.upsertInstallation(e.installation.id, e.installation.account);
-    for (const repo of e.repositories ?? []) await this.upsertRepo(id, repo);
+    const repoIds = [];
+    for (const repo of e.repositories ?? []) repoIds.push(await this.upsertRepo(id, repo));
+    await this.linkSender(e.sender?.id, id, repoIds);
   }
 
   async onRepositories(e: InstallationRepositoriesEvent): Promise<void> {
     const id = await this.upsertInstallation(e.installation.id, e.installation.account);
-    for (const repo of e.repositories_added) await this.upsertRepo(id, repo);
+    const repoIds = [];
+    for (const repo of e.repositories_added) repoIds.push(await this.upsertRepo(id, repo));
+    await this.linkSender(e.sender?.id, id, repoIds);
     const removed = e.repositories_removed.map((r) => r.id);
     if (removed.length)
       await this.db.query("delete from repos where github_repo_id = any($1)", [removed]);
   }
 
   /**
-   * Called once after sign-in with the user's GitHub token, which is used here and not stored.
+   * Called once after sign-in with the user's GitHub token, which is used here and not kept by the API.
+   * Links the user to each installation and to only the repos GitHub lets them see in it.
    * shortcut: not in one transaction; a failure midway leaves the user unlinked until the next sign-in.
    */
   async linkUser(userId: string, githubToken: string): Promise<Me> {
@@ -57,12 +67,26 @@ export class InstallationsService implements InstallationEvents {
          github_login = excluded.github_login, avatar_url = excluded.avatar_url`,
       [userId, user.id, user.login, user.avatar_url],
     );
-    const ids = [];
-    for (const inst of installs) ids.push(await this.upsertInstallation(inst.id, inst.account));
+    const installationIds: string[] = [];
+    const repoIds: string[] = [];
+    for (const inst of installs) {
+      const id = await this.upsertInstallation(inst.id, inst.account);
+      installationIds.push(id);
+      for (const repo of await this.github.listInstallationRepos(githubToken, inst.id)) {
+        repoIds.push(await this.upsertRepo(id, repo));
+      }
+    }
     await this.db.query("delete from user_installations where user_id = $1", [userId]);
-    for (const id of ids) {
+    await this.db.query("delete from user_repos where user_id = $1", [userId]);
+    for (const id of installationIds) {
       await this.db.query(
         "insert into user_installations (user_id, installation_id) values ($1, $2)",
+        [userId, id],
+      );
+    }
+    for (const id of repoIds) {
+      await this.db.query(
+        "insert into user_repos (user_id, repo_id) values ($1, $2) on conflict do nothing",
         [userId, id],
       );
     }
@@ -93,12 +117,44 @@ export class InstallationsService implements InstallationEvents {
     return row?.id as string;
   }
 
-  private async upsertRepo(installationId: string, repo: { id: number; full_name: string }) {
-    await this.db.query(
+  private async upsertRepo(
+    installationId: string,
+    repo: { id: number; full_name: string },
+  ): Promise<string> {
+    const [row] = await this.db.query<{ id: string }>(
       `insert into repos (installation_id, github_repo_id, full_name) values ($1, $2, $3)
        on conflict (github_repo_id) do update set installation_id = excluded.installation_id,
-         full_name = excluded.full_name`,
+         full_name = excluded.full_name
+       returning id`,
       [installationId, repo.id, repo.full_name],
     );
+    return row?.id as string;
+  }
+
+  /**
+   * Whoever installs the app or adds repos to it can see those repos, so link them right away;
+   * the dashboard then shows them without a new sign-in. A sender who hasn't signed in yet links at sign-in.
+   */
+  private async linkSender(
+    githubUserId: number | undefined,
+    installationId: string,
+    repoIds: string[],
+  ) {
+    if (!githubUserId) return;
+    const [user] = await this.db.query<{ id: string }>(
+      "select id from users where github_id = $1",
+      [githubUserId],
+    );
+    if (!user) return;
+    await this.db.query(
+      "insert into user_installations (user_id, installation_id) values ($1, $2) on conflict do nothing",
+      [user.id, installationId],
+    );
+    for (const repoId of repoIds) {
+      await this.db.query(
+        "insert into user_repos (user_id, repo_id) values ($1, $2) on conflict do nothing",
+        [user.id, repoId],
+      );
+    }
   }
 }

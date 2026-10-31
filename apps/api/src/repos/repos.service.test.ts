@@ -34,6 +34,11 @@ describe("ReposService", () => {
     expect((await svc.update(ME, repos.one, { depth: "quick" }))?.enabled).toBe(false);
   });
 
+  it("hides a repo in the user's installation that GitHub doesn't let them see", async () => {
+    expect((await svc.list(ME)).map((r) => r.fullName)).not.toContain("a/hidden");
+    expect(await svc.update(ME, repos.hidden, { enabled: false })).toBeUndefined();
+  });
+
   it("treats another user's repo as not found", async () => {
     expect(await svc.update(ME, repos.secret, { enabled: false })).toBeUndefined();
     expect((await svc.list(STRANGER)).map((r) => r.fullName)).toEqual(["z/secret"]);

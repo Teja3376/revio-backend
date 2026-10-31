@@ -66,7 +66,7 @@ const toSummary = (r: Row): ReviewSummaryDto => ({
 });
 
 const FROM = `from reviews v join repos r on r.id = v.repo_id
-  where r.installation_id in (select installation_id from user_installations where user_id = $1)`;
+  where r.id in (select repo_id from user_repos where user_id = $1)`;
 const COLUMNS = `v.id, v.repo_id, r.full_name, v.pr_number, v.pr_title, v.pr_url, v.status, v.issue_count,
   v.started_at, v.finished_at, v.summary, v.risk, v.error`;
 

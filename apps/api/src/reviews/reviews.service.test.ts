@@ -68,6 +68,12 @@ describe("ReviewsService", () => {
     });
   });
 
+  it("hides reviews of a repo the user can't see, even in their installation", async () => {
+    const id = await addReview(repos.hidden, 1, "s1", "2026-10-01T10:00:00Z");
+    expect(await svc.get(ME, id)).toBeUndefined();
+    expect((await svc.list(ME, { page: 1 })).total).toBe(0);
+  });
+
   it("treats another user's review as not found", async () => {
     const id = await addReview(repos.secret, 1, "s1", "2026-10-01T10:00:00Z");
     expect(await svc.get(ME, id)).toBeUndefined();

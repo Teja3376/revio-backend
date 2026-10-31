@@ -36,5 +36,17 @@ export function githubUserApi(fetchImpl: Fetch = fetch): GithubUserApi {
         if (installations.length < 100) return all;
       }
     },
+    async listInstallationRepos(token, installationId) {
+      type Page = { repositories: { id: number; full_name: string }[] };
+      const all: Page["repositories"] = [];
+      for (let page = 1; ; page++) {
+        const { repositories } = await get<Page>(
+          `/user/installations/${installationId}/repositories?per_page=100&page=${page}`,
+          token,
+        );
+        all.push(...repositories.map((r) => ({ id: r.id, full_name: r.full_name })));
+        if (repositories.length < 100) return all;
+      }
+    },
   };
 }
