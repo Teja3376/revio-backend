@@ -1,3 +1,10 @@
 packages:
   - "packages/*"
   - "apps/*"
+# Install scripts pnpm may run. esbuild and vsce-sign need theirs to build and package the VS Code extension.
+allowBuilds:
+  esbuild: true
+  "@vscode/vsce-sign": true
+  "@google/genai": false
+  "@scarf/scarf": false
+  protobufjs: false
