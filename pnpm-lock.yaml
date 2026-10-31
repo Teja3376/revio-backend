@@ -205,6 +205,12 @@ importers:
       '@octokit/app':
         specifier: ^16.1.4
         version: 16.1.4
+      '@octokit/core':
+        specifier: ^7.0.8
+        version: 7.0.8
+      '@octokit/plugin-paginate-rest':
+        specifier: ^16.0.0
+        version: 16.0.0(@octokit/core@7.0.8)
       '@octokit/webhooks-methods':
         specifier: ^6.0.0
         version: 6.0.0
@@ -976,6 +982,12 @@ packages:
 
   '@octokit/plugin-paginate-rest@15.0.0':
     resolution: {integrity: sha512-lw9A9YL5s4VPj+VEx8uMxaxQm2YTgrPDkrLEuZuu18R8TK3oPcXF4K6t52nx6xn1RcogZC9i188sAr/4XYJaQQ==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      '@octokit/core': '>=6'
+
+  '@octokit/plugin-paginate-rest@16.0.0':
+    resolution: {integrity: sha512-7RtUeGZypAK4EA4LrjTCnsLALNOoUcYh5vOnCNXpdIQVTQCPh4OFu7324iPqAls3KGgVnZktKUnNKZCOKyHrlA==}
     engines: {node: '>= 20'}
     peerDependencies:
       '@octokit/core': '>=6'
@@ -3745,6 +3757,11 @@ snapshots:
     dependencies:
       '@octokit/core': 7.0.8
       '@octokit/types': 17.0.0
+
+  '@octokit/plugin-paginate-rest@16.0.0(@octokit/core@7.0.8)':
+    dependencies:
+      '@octokit/core': 7.0.8
+      '@octokit/types': 18.0.0
 
   '@octokit/request-error@7.1.2':
     dependencies:
