@@ -1,0 +1,20 @@
+name: Release VS Code extension
+on:
+  push:
+    tags: ["vscode-v*"]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter revio-vscode test
+      - run: pnpm --filter revio-vscode package
+      - run: pnpm --filter revio-vscode exec vsce publish --no-dependencies --packagePath revio-vscode-*.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
